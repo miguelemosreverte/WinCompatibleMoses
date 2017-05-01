@@ -1,0 +1,4 @@
+
+#ignore the procedurally generated files
+docker-ip
+DockerToolbox.exe
