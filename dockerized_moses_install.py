@@ -1,4 +1,4 @@
-import os, shutil, subprocess
+import os, subprocess
 
 def install(package):
     """@brief     Imports modules and installs them if they are not."""
@@ -15,24 +15,6 @@ def install(package):
             import pip
         pip.main(['install', package])
 
-def download_my_repo():
-    install("gitpython")
-    import git
-
-    DIR_NAME = "Moses-API"
-    REMOTE_URL = "https://github.com/miguelemosreverte/Moses-API.git"
-
-    if os.path.isdir(DIR_NAME):
-        shutil.rmtree(DIR_NAME)
-
-    os.mkdir(DIR_NAME)
-
-    repo = git.Repo.init(DIR_NAME)
-    origin = repo.create_remote('origin',REMOTE_URL)
-    origin.fetch()
-    origin.pull(origin.refs[0].remote_head)
-
-    print "---- DONE ----"
 
 def download_and_run_docker_toolset():
     install("urllib2")
@@ -64,21 +46,32 @@ def download_and_run_docker_toolset():
     #now run the installer
     os.system("DockerToolbox.exe")
 
-#download_my_repo()
-#download_and_run_docker_toolset()
-directory = os.path.abspath("./Moses-API/")
 
-commands_to_run_inside_of_docker = "";
-#create a good docker machine
-commands_to_run_inside_of_docker += "docker-machine create --driver virtualbox --virtualbox-cpu-count 4 --virtualbox-memory \"7900\" --virtualbox-disk-size \"40000\" acrazymachineforacrazyidea; ";
-#eval docker machine
-commands_to_run_inside_of_docker += "eval \"$(docker-machine env acrazymachineforacrazyidea)\";";
-#and build the moses image
-commands_to_run_inside_of_docker += " docker build -t test1 \"" + directory + "\""
-#and remain open
-commands_to_run_inside_of_docker += ";bash";
+def create_MosesAPI_docker_image():
+    directory = os.path.abspath("./Moses-API/")
 
-os.chdir("C:\Program Files\Docker Toolbox")
-p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
+    commands_to_run_inside_of_docker = "";
+    #create a good docker machine
+    commands_to_run_inside_of_docker += "docker-machine rm acrazymachineforacrazyidea -y; ";
+    commands_to_run_inside_of_docker += "docker-machine create --driver virtualbox --virtualbox-cpu-count 4 --virtualbox-memory \"7900\" --virtualbox-disk-size \"40000\" acrazymachineforacrazyidea; ";
+    #eval docker machine
+    commands_to_run_inside_of_docker += "eval \"$(docker-machine env acrazymachineforacrazyidea)\";";
+    #and build the moses image
+    commands_to_run_inside_of_docker += " docker build -t test1 \"" + directory + "\""
+    #and remain open
+    #commands_to_run_inside_of_docker += ";bash";
+
+    os.chdir("C:\Program Files\Docker Toolbox")
+    p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
+
+def get_docker_ip():
+    commands_to_run_inside_of_docker = "docker-machine ip > \"" + os.path.abspath("docker-ip.txt") + "\";";
+    os.chdir("C:\Program Files\Docker Toolbox")
+    p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
+
+if __name__ == "__main__":
+    download_and_run_docker_toolset()
+    create_MosesAPI_docker_image()
+    get_docker_ip()
 
 
