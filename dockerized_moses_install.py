@@ -16,7 +16,7 @@ def install(package):
         pip.main(['install', package])
 
 
-def download_and_run_docker_toolset():
+def download_docker_toolset():
     install("urllib2")
     import urllib2
     
@@ -43,35 +43,42 @@ def download_and_run_docker_toolset():
         print status,
 
     f.close()
-    #now run the installer
-    os.system("DockerToolbox.exe")
 
+
+def get_half_the_system_memory():
+    install('psutil') 
+    from psutil import virtual_memory
+    mem = virtual_memory()
+    return str((mem.total / 2) / 1000000)
+def get_the_system_cores():
+    install('psutil') 
+    from psutil import cpu_count
+    return str(cpu_count())
 
 def create_MosesAPI_docker_image():
-    directory = os.path.abspath("./Moses-API/")
-
-    commands_to_run_inside_of_docker = "";
+    commands_to_run_inside_of_docker = "docker-machine create --driver virtualbox default;";
     #create a good docker machine
     commands_to_run_inside_of_docker += "docker-machine rm acrazymachineforacrazyidea -y; ";
-    commands_to_run_inside_of_docker += "docker-machine create --driver virtualbox --virtualbox-cpu-count 4 --virtualbox-memory \"7900\" --virtualbox-disk-size \"40000\" acrazymachineforacrazyidea; ";
+    commands_to_run_inside_of_docker +=  "docker-machine create --driver virtualbox --virtualbox-cpu-count "+get_the_system_cores()+" --virtualbox-memory "\
+        + '"' + get_half_the_system_memory() + '"' + " --virtualbox-disk-size \"40000\" acrazymachineforacrazyidea; ";
     #eval docker machine
     commands_to_run_inside_of_docker += "eval \"$(docker-machine env acrazymachineforacrazyidea)\";";
     #and build the moses image
-    commands_to_run_inside_of_docker += " docker build -t test1 \"" + directory + "\""
+    commands_to_run_inside_of_docker += " docker build -t test1 \"" + os.path.abspath("./WinCompatibleMoses/Moses-API/") + "\""
     #and remain open
     #commands_to_run_inside_of_docker += ";bash";
 
     os.chdir("C:\Program Files\Docker Toolbox")
-    p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
-
-def get_docker_ip():
-    commands_to_run_inside_of_docker = "docker-machine ip > \"" + os.path.abspath("docker-ip.txt") + "\";";
-    os.chdir("C:\Program Files\Docker Toolbox")
-    p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
+    p = subprocess.check_call(['start.sh', commands_to_run_inside_of_docker], shell=True)
 
 if __name__ == "__main__":
-    download_and_run_docker_toolset()
+    #first
+    download_docker_toolset()
+    #now run the installer
+    os.system("DockerToolbox.exe")
+    #then delete the installer
+    os.remove("DockerToolbox.exe")
+    #and finally
     create_MosesAPI_docker_image()
-    get_docker_ip()
 
 
