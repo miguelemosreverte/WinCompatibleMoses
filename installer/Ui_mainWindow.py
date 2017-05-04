@@ -32,11 +32,12 @@ class MyCustomWidget(QtGui.QWidget):
 
         self.progressBar = QtGui.QProgressBar(self)
         self.progressBar.setRange(0,100)
-        button = QtGui.QPushButton("Start", self)
+        self.progressBar.setValue(0 + os.path.isfile("current.txt") * 20)
+        self.button = QtGui.QPushButton("Continue" if os.path.isfile("current.txt") else "Start", self)
         layout.addWidget(self.progressBar)
-        layout.addWidget(button)
+        layout.addWidget(self.button)
 
-        button.clicked.connect(self.onStart)
+        self.button.clicked.connect(self.onStart)
 
         self.myLongTask = TaskThread()
         self.mySecondLongestLongTask = FakeProgress()
@@ -46,6 +47,7 @@ class MyCustomWidget(QtGui.QWidget):
     def onStart(self):
         self.mySecondLongestLongTask.start()
         self.myLongTask.start()
+        self.button.setEnabled(False)
 
     def onProgress(self, i):
         self.progressBar.setValue(i)
@@ -60,7 +62,10 @@ class FakeProgress(QtCore.QThread):
 
 class TaskThread(QtCore.QThread):
     def run(self):
-        os.system("python ./WinCompatibleMoses/dockerized_moses_install.py")
+        if not os.path.isfile("current.txt"):
+            os.system("python step_one.py")
+        else:
+            os.system("python step_two.py")
 
 class Ui_MainWindow(object):
 
@@ -93,7 +98,7 @@ class Ui_MainWindow(object):
         groupBox.setObjectName(_fromUtf8("groupBox"))
         gridLayout = QtGui.QGridLayout(groupBox)
         gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        groupBox.setStyleSheet("border-image: url(./WinCompatibleMoses/installer/docker.png);")
+        groupBox.setStyleSheet("border-image: url(docker.png);")
 
         self.progressBar = MyCustomWidget(self.centralWidget)
 
@@ -108,7 +113,9 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignTrailing |
             QtCore.Qt.AlignVCenter)
         self.labelInfo.setObjectName(_fromUtf8("labelInfo"))
-        self.labelInfo.setText("Warning: This could take up to 4 hours")
+        label_texts = ["Warning: This could take up to 4 hours, and there's a reboot incoming", 
+                       "Okay, no more reboots. Just hours of slow install. You can sit back and enjoy now."]
+        self.labelInfo.setText(label_texts[os.path.isfile("current.txt")])
         verticalLayout.addWidget(self.labelInfo)
         MainWindow.setCentralWidget(self.centralWidget)
 
