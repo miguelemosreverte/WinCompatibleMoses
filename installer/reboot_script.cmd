@@ -1,7 +1,7 @@
 @echo off
 call :Resume
 goto %current%
-goto :eof
+EXIT
 
 :one
 ::Add script to Run key
@@ -10,14 +10,13 @@ echo two >%~dp0current.txt
 echo Press any key to reboot the system and continue the installation 
 pause
 shutdown -r -t 0
-goto :eof
+EXIT
 
 :two
 ::Remove script from Run key
 reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v %~n0 /f
 python %~dp0main.py
-pause
-goto :eof
+EXIT
 
 :resume
 if exist %~dp0current.txt (

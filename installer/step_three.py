@@ -34,12 +34,12 @@ def create_MosesAPI_docker_image():
     #eval docker machine
     commands_to_run_inside_of_docker += "eval \"$(docker-machine env acrazymachineforacrazyidea)\";";
     #and build the moses image
-    commands_to_run_inside_of_docker += " docker build -t test1 \"" + os.path.abspath("./WinCompatibleMoses/Moses-API/") + "\""
+    commands_to_run_inside_of_docker += " docker build -t test1 \"" + os.path.abspath("../Moses-API/").replace("\\","/") + "/\"" + ";"
     #and remain open
     #commands_to_run_inside_of_docker += ";bash";
 
     os.chdir("C:\Program Files\Docker Toolbox")
-    p = subprocess.check_call(['start.sh', commands_to_run_inside_of_docker], shell=True)
+    p = subprocess.Popen(['start.sh', commands_to_run_inside_of_docker], shell=True)
 
 if __name__ == "__main__":
     create_MosesAPI_docker_image()
