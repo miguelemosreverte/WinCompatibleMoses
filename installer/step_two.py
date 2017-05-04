@@ -2,10 +2,9 @@ import os, subprocess
 
 
 
-def create_MosesAPI_docker_image():
-    commands = ""
+def create_MosesAPI_docker_image():    
     #first create the default docker machine if it does not exists
-    commands += "start.sh docker-machine ip; "  
+    commands = ""
     #then run the third and last part of the installation
     commands += "python \"" + (os.path.join(os.path.dirname(os.path.abspath(__file__)), "step_three.py")) + "\";"
     
