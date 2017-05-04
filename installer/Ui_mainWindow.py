@@ -7,9 +7,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, QtSvg
 
-import sys
+import sys,os
 from PyQt4.QtCore import QSize, Qt
 from PyQt4.QtGui import *
 from PyQt4.QtWebKit import *
@@ -39,28 +39,32 @@ class MyCustomWidget(QtGui.QWidget):
         button.clicked.connect(self.onStart)
 
         self.myLongTask = TaskThread()
-        self.myLongTask.notifyProgress.connect(self.onProgress)
+        self.mySecondLongestLongTask = FakeProgress()
+        self.mySecondLongestLongTask.notifyProgress.connect(self.onProgress)
 
 
     def onStart(self):
+        self.mySecondLongestLongTask.start()
         self.myLongTask.start()
 
     def onProgress(self, i):
         self.progressBar.setValue(i)
 
 
-class TaskThread(QtCore.QThread):
+class FakeProgress(QtCore.QThread):
     notifyProgress = QtCore.pyqtSignal(int)
     def run(self):
-        for i in range(100):#this will take 4 hours
+        for i in range(1,100):#this will take roughly 4 hours
             self.notifyProgress.emit(i)
             time.sleep((4*60*60)/100)
+
+class TaskThread(QtCore.QThread):
+    def run(self):
+        os.system("python ./WinCompatibleMoses/dockerized_moses_install.py")
 
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
-        self.modified_table_items_coordinates = []
-        self.lastChangedTableItemCoordinates = (-1,-1)
 
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(705, 491)
@@ -84,10 +88,16 @@ class Ui_MainWindow(object):
         verticalLayout = QtGui.QVBoxLayout(self.centralWidget)
         verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
 
-        self.background_color_palette = QtGui.QPalette()
-        self.background_color_palette.setColor(QtGui.QPalette.Background,QColor("#edf2f6"))
+
+        groupBox= QtGui.QGroupBox()
+        groupBox.setObjectName(_fromUtf8("groupBox"))
+        gridLayout = QtGui.QGridLayout(groupBox)
+        gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        groupBox.setStyleSheet("border-image: url(./WinCompatibleMoses/installer/docker.png);")
+
         self.progressBar = MyCustomWidget(self.centralWidget)
 
+        verticalLayout.addWidget(groupBox)
         verticalLayout.addWidget(self.progressBar)
 
 
@@ -98,6 +108,7 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignTrailing |
             QtCore.Qt.AlignVCenter)
         self.labelInfo.setObjectName(_fromUtf8("labelInfo"))
+        self.labelInfo.setText("Warning: This could take up to 4 hours")
         verticalLayout.addWidget(self.labelInfo)
         MainWindow.setCentralWidget(self.centralWidget)
 

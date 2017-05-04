@@ -2,7 +2,6 @@
 
 from PyQt4.QtGui import QApplication
 
-import os
 import sys
 
 from mainWindow import MainWindow
