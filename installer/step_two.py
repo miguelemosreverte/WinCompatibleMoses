@@ -1,5 +1,6 @@
 import os, subprocess
 
+from WinPersistence import postReboot
 
 
 def create_MosesAPI_docker_image():    
@@ -11,7 +12,9 @@ def create_MosesAPI_docker_image():
     os.chdir("C:\Program Files\Docker Toolbox")
     p = subprocess.Popen(['start.sh', commands], shell=True)
     
-if __name__ == "__main__":
+if __name__ == "__main__":   
+    
+    postReboot()
     create_MosesAPI_docker_image()
 
 

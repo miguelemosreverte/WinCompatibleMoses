@@ -17,6 +17,7 @@ import time
 import icons_rc
 _fromUtf8 = getattr(QtCore.QString, 'fromUtf8', lambda s: s)
 
+MainWindowReference = ""
 
 def _translate(context, text, disambig):
     return QtGui.QApplication.translate(
@@ -24,6 +25,7 @@ def _translate(context, text, disambig):
         getattr(
             QtGui.QApplication, 'UnicodeUTF8',
             QtCore.QCoreApplication.Encoding))
+
 class MyCustomWidget(QtGui.QWidget):
 
     def __init__(self, parent=None):
@@ -58,19 +60,21 @@ class FakeProgress(QtCore.QThread):
     def run(self):
         for i in range(1,100):#this will take roughly 4 hours
             self.notifyProgress.emit(i)
-            time.sleep((4*60*60)/100)
 
 class TaskThread(QtCore.QThread):
     def run(self):
         if not os.path.isfile("current.txt"):
             os.system("python step_one.py")
+            os.system("python util.py")            
+            sys.exit(0)
+            
         else:
             os.system("python step_two.py")
 
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
-
+        MainWindowReference = MainWindow
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(705, 491)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)

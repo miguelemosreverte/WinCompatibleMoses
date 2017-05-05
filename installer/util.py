@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import sys,os
 
 from PyQt4.QtGui import (
     QApplication,
@@ -27,5 +27,5 @@ def doQuestion(text):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    doAlert("doAlert")
-    print doQuestion("doQuestion")
+    if doQuestion("Reboot now"): 
+        os.system("shutdown -r -t 0")

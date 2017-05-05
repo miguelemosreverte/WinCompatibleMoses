@@ -1,4 +1,5 @@
-import os, subprocess
+import os,sys, subprocess
+from WinPersistence import preReboot
 
 def install(package):
     """@brief     Imports modules and installs them if they are not."""
@@ -19,7 +20,7 @@ def install(package):
 def download_docker_toolset():
     install("urllib2")
     import urllib2
-    
+
     url = "https://download.docker.com/win/stable/DockerToolbox.exe"
 
     file_name = url.split('/')[-1]
@@ -45,7 +46,6 @@ def download_docker_toolset():
     f.close()
 
 
-
 if __name__ == "__main__":
     #first
     download_docker_toolset()
@@ -54,5 +54,5 @@ if __name__ == "__main__":
     #then delete the installer
     os.remove("DockerToolbox.exe")
     #now reboot
-    os.system("reboot_script.cmd")
-
+    preReboot()
+    open("current.txt", 'a').close()
